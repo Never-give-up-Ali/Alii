@@ -59,7 +59,7 @@ class SDText2ImgTool(BaseTool):
 
 
 class AgentState(TypedDict):
-    """全局状态，在各节点间流转"""
+
     user_query: str
     session_id: Optional[str]
 
@@ -91,7 +91,7 @@ class AgentState(TypedDict):
 
 
 class RouterNode:
-    """Router：判断用户意图是绘图还是聊天"""
+    """判断用户意图是绘图还是聊天"""
 
     def __init__(self, llm):
         self.llm = llm
@@ -111,7 +111,6 @@ class RouterNode:
 
 
 class ResponderNode:
-    """Responder：直接回复用户（非绘图请求）"""
 
     def __init__(self, llm):
         self.llm = llm
@@ -125,7 +124,7 @@ class ResponderNode:
 
 
 class PlannerNode:
-    """Planner：解析需求，制定绘图计划"""
+   
 
     def __init__(self, llm):
         self.llm = llm
@@ -294,7 +293,7 @@ class ReviewerNode:
 
 
 def route_after_router(state: AgentState) -> str:
-    """Router 节点后的条件路由"""
+    
     if state.get('intent') == "draw":
         return "draw_flow"
     else:
@@ -364,7 +363,6 @@ def apply_review_feedback(state: AgentState) -> AgentState:
 
 
 def build_agent_graph(llm, sd_tool) -> StateGraph:
-    """构建完整的 Agent 协同图"""
 
     # 初始化节点
     router = RouterNode(llm)
@@ -373,7 +371,6 @@ def build_agent_graph(llm, sd_tool) -> StateGraph:
     worker = WorkerNode(sd_tool)
     reviewer = ReviewerNode(llm, max_retries=3)
 
-    # 创建图
     graph = StateGraph(AgentState)
 
     # 添加所有节点
@@ -400,7 +397,6 @@ def build_agent_graph(llm, sd_tool) -> StateGraph:
     graph.add_edge("planner", "worker")
     graph.add_edge("worker", "reviewer")
 
-    # Reviewer 后的条件分支
     graph.add_conditional_edges(
         "reviewer",
         should_continue,
